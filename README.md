@@ -1,115 +1,113 @@
-<h1 align="center">Text Annotation for Claude Code</h1>
+# Text Annotation for Claude Code
 
-<p align="center">
-  <strong>The open-source text annotation desk that is just a database and Claude Code.</strong>
-</p>
+Own the text, the labels and the reasons behind them. Plan annotation batches, settle disagreements and freeze reviewed training datasets in a database you control.
 
-<p align="center">
-  Created by <a href="https://www.enterprisedna.co"><strong>Enterprise DNA</strong></a>. Free and open source. Works with Claude Code, Codex, OpenCode or Cursor.
-</p>
+## Three ways to use it
 
-<!-- three-doors -->
-<table align="center">
-  <tr>
-    <td align="center"><strong>Do it yourself</strong><br/>Clone it, run it, own it. Free, MIT.<br/><a href="#quick-start">Quick start</a></td>
-    <td align="center"><strong>We customise it</strong><br/>Your fields, your rules, your Datasaur data brought across.<br/><a href="https://enterprisedna.co/omni/book/?utm_source=github&utm_medium=readme&utm_campaign=datasaur">Book a call</a></td>
-    <td align="center"><strong>We run it for you</strong><br/>Installed, connected and operated inside Omni. Setup fee, then a retainer.<br/><a href="https://enterprisedna.co/omni/instead-of/datasaur?utm_source=github&utm_medium=readme&utm_campaign=datasaur">How it works</a></td>
-  </tr>
-</table>
-
-<p align="center">
-  <a href="#what-is-this">What is this</a> &bull;
-  <a href="#why-no-front-end">Why no front end</a> &bull;
-  <a href="#quick-start">Quick start</a> &bull;
-  <a href="#the-commands">Commands</a> &bull;
-  <a href="#instead-of-datasaur">Instead of Datasaur</a> &bull;
-  <a href="#want-it-installed-and-run-for-you">Installed for you</a> &bull;
-  <a href="#license">License</a>
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Node-20+-339933?style=flat-square" alt="Node 20+" />
-  <img src="https://img.shields.io/badge/PostgreSQL-any-336791?style=flat-square" alt="PostgreSQL" />
-  <img src="https://img.shields.io/badge/PGlite-embedded-3ecf8e?style=flat-square" alt="PGlite" />
-  <img src="https://img.shields.io/badge/License-MIT-yellow?style=flat-square" alt="MIT License" />
-</p>
-
----
-
-## What is this
-
-Text Annotation for Claude Code does the job you pay Datasaur for, as a Postgres database and a set of agent commands. There is no web front end. You open the folder in [Claude Code](https://claude.com/claude-code) (or Codex, OpenCode, Cursor: see `AGENTS.md`) and ask for what you want in plain language. It runs the right query, and it can answer questions the Datasaur dashboard cannot.
-
-<!-- TODO(author): the annual bill. One sentence: what a 10 to 50 person business typically pays Datasaur per year, all in, with a source. -->
-
-Want the same thing with a web front end, or built on a different stack? That is a customisation, and it is exactly what Enterprise DNA does: [book a call](https://enterprisedna.co/omni/book/?utm_source=github&utm_medium=readme&utm_campaign=datasaur).
-
-<!-- TODO(author): two or three sentences on what this specific product covers and who it is for. -->
-
-## Why no front end
-
-- The front end was only ever there because the database was hard to talk to. That is no longer true.
-- Your data sits in plain Postgres tables you own. Any tool can read them. No export, no lock-in.
-- No seats, no tiers, no add-ons. Read [docs/why-no-front-end.md](docs/why-no-front-end.md) for the honest trade-offs too.
+- **Do it yourself:** free MIT source. Run the demo with Claude Code, Codex, OpenCode or Cursor. Use one command library.
+- **We customise it:** Enterprise DNA brings your Datasaur exports across and builds your labels, checks, connections and screens. Setup fee, then a retainer.
+- **We run it for you:** installed, connected and operated through **Omni by Enterprise DNA**, for a setup fee then a retainer. [Book 30 minutes with Sam](https://enterprisedna.co/omni/book?offer=replace-software&utm_campaign=datasaur&utm_medium=readme).
 
 ## Quick start
 
-Sixty seconds, no database install (an embedded Postgres runs inside Node):
+Node 20 or newer, on Windows or Linux. PGlite runs locally without a server; PostgreSQL uses DATABASE_URL.
 
 ```bash
-git clone https://github.com/Enterprise-DNA-OS/text-annotation-for-claude-code.git
-cd text-annotation-for-claude-code
 npm install
 npm run demo
+npm run annotation -- queue
+npm run annotation -- disagreements
+npm run annotation -- weekly-review
+npm run view
+npm run docs
+npm test
 ```
 
-Then open the folder in Claude Code and type a slash command. <!-- TODO(author): name the first command to try. -->
+The demo has seven synthetic examples across two projects: one ready, one disagreement, unfinished labels, missing evidence, a held example and an overdue retention review. Seeding twice leaves it unchanged. Never seed a working database.
 
-### Use it with your own Postgres or Supabase
+## The annotation week
 
-Copy `.env.example` to `.env`, set `DATABASE_URL`, then `npm run migrate`. Same commands, shared data, no per-seat fee.
+/queue plans the batch, /annotate records a decision and its reason, /disagreements prepares the calibration meeting, /adjudicate records an independent review, and /release freezes the final dataset. /weekly-review combines progress, attention, disagreements, evidence and label coverage. /draft-review-note creates a private draft and never sends it.
 
-## The commands
+One question per project. Each answer is a sorted set of labels. Multiple projects can represent different questions on the same source text. This base handles text classification, including multi-label answers. It does not claim to reproduce a multimedia annotation editor, token spans, bounding boxes, audio transcription, model training or an outsourced workforce.
 
-<!-- TODO(author): a table of the slash commands in .claude/commands and what each one does. -->
+## Bring your Datasaur history
 
-| Command | What it does |
-|---|---|
-| `/...` | ... |
-
-## Instead of Datasaur
-
-<!-- TODO(author): how to bring data across from Datasaur; link docs/replace-datasaur.md -->
-
-## Architecture
-
-```
-text-annotation-for-claude-code/
-  CLAUDE.md                 how the operator wants this run (routing table + house rules)
-  AGENTS.md                 the same, for Codex / OpenCode / Cursor / Gemini CLI
-  .claude/commands/         the slash commands
-  scripts/                  the CLI the commands drive
-  scripts/lib/db.mjs        one adapter: DATABASE_URL (pg) or embedded PGlite
-  supabase/migrations/      plain SQL schema
-  supabase/seed.sql         demo data
-  docs/                     the thesis and the migration guide
+```bash
+npm run annotation -- import datasaur --project=DEMO --file=fixtures/datasaur.csv --map=fixtures/datasaur-map.json --source=first-export --owner=Rae --due=2099-01-01 --actor="Import operator" --dry-run
 ```
 
-## Built for coding agents
+Map your actual row-label export headers once, then repeat without --dry-run. The supplied CSV is synthetic and follows the documented row format, not a downloaded customer specimen. Every original row and source answer is retained. Repeated lines with the same text become one item with all answers preserved. Changed records under an existing source identifier fail instead of overwriting history. [Full switch guide](docs/replace-datasaur.md).
 
-The database, CLI and command recipes work with Claude Code, Codex, OpenCode or Cursor. Ask your coding agent for a new command and have it implement and test the change against the same records.
+## Ten questions your own desk answers
 
-## Contributing
+1. Which examples are overdue and who owns them? `attention`
+2. Where do reviewers disagree under the current guidelines? `disagreements`
+3. Which labels have no approved examples? `coverage`
+4. Which reviewers still have labels from an old guideline? `reviewer-workload`
+5. Which records have no accuracy and privacy evidence? `compliance`
+6. Which dataset has an overdue retention review? `compliance`
+7. What changed between the first label and the final decision? `history`
+8. Which imported answers were unresolved at the source? `detail`
+9. What exact examples and labels went into a training release? `export --release=<code>`
+10. Which project is ready, and which one is waiting for adjudication? `projects`
 
-Issues and pull requests are welcome. Keep the shape: plain SQL, a small CLI, a slash command per recurring job, no front end.
+These are implemented queries over your text, local review rules and evidence. They are not an unsupported claim that Datasaur cannot offer similar reports.
 
-## Want it installed and run for you?
+## Commands
 
-Enterprise DNA installs Text Annotation for Claude Code for your business, migrates your Datasaur data, connects it to the rest of your tools, and runs it for you as part of **Omni**, our managed Command Center. One setup fee, then a monthly retainer.
+- `help`: see [.claude/commands/help.md](.claude/commands/help.md).
+- `add-project`: see [.claude/commands/add-project.md](.claude/commands/add-project.md).
+- `add-item`: see [.claude/commands/add-item.md](.claude/commands/add-item.md).
+- `assign`: see [.claude/commands/assign.md](.claude/commands/assign.md).
+- `annotate`: see [.claude/commands/annotate.md](.claude/commands/annotate.md).
+- `adjudicate`: see [.claude/commands/adjudicate.md](.claude/commands/adjudicate.md).
+- `privacy-check`: see [.claude/commands/privacy-check.md](.claude/commands/privacy-check.md).
+- `hold`: see [.claude/commands/hold.md](.claude/commands/hold.md).
+- `unhold`: see [.claude/commands/unhold.md](.claude/commands/unhold.md).
+- `guidelines`: see [.claude/commands/guidelines.md](.claude/commands/guidelines.md).
+- `retention-review`: see [.claude/commands/retention-review.md](.claude/commands/retention-review.md).
+- `log`: see [.claude/commands/log.md](.claude/commands/log.md).
+- `import`: see [.claude/commands/import.md](.claude/commands/import.md).
+- `release`: see [.claude/commands/release.md](.claude/commands/release.md).
+- `detail`: see [.claude/commands/detail.md](.claude/commands/detail.md).
+- `history`: see [.claude/commands/history.md](.claude/commands/history.md).
+- `weekly-review`: see [.claude/commands/weekly-review.md](.claude/commands/weekly-review.md).
+- `draft-review-note`: see [.claude/commands/draft-review-note.md](.claude/commands/draft-review-note.md).
+- `export`: see [.claude/commands/export.md](.claude/commands/export.md).
+- `projects`: see [.claude/commands/projects.md](.claude/commands/projects.md).
+- `items`: see [.claude/commands/items.md](.claude/commands/items.md).
+- `queue`: see [.claude/commands/queue.md](.claude/commands/queue.md).
+- `attention`: see [.claude/commands/attention.md](.claude/commands/attention.md).
+- `disagreements`: see [.claude/commands/disagreements.md](.claude/commands/disagreements.md).
+- `coverage`: see [.claude/commands/coverage.md](.claude/commands/coverage.md).
+- `reviewer-workload`: see [.claude/commands/reviewer-workload.md](.claude/commands/reviewer-workload.md).
+- `compliance`: see [.claude/commands/compliance.md](.claude/commands/compliance.md).
+- `imports`: see [.claude/commands/imports.md](.claude/commands/imports.md).
+- `releases`: see [.claude/commands/releases.md](.claude/commands/releases.md).
+- `audit`: see [.claude/commands/audit.md](.claude/commands/audit.md).
 
-- Book a call: [enterprisedna.co/omni/book](https://enterprisedna.co/omni/book/?offer=replace-software&utm_source=github&utm_medium=readme&utm_campaign=datasaur)
-- Read more: [enterprisedna.co/omni/instead-of/datasaur](https://enterprisedna.co/omni/instead-of/datasaur?utm_source=github&utm_medium=readme&utm_campaign=datasaur)
+All commands accept --json. Mutations require --actor. Names, codes and ID fragments resolve without case sensitivity; an ambiguous match lists choices and exits 1. Flags use --name=value. Labels are separated with semicolons inside a quoted argument.
 
-## License
+## Paperwork and views
 
-MIT. Copyright (c) 2026 Enterprise DNA.
+brand.json sets the business name, colours and logo. npm run docs generates a dataset review card, an adjudication evidence record for every example, and a manifest for each local release. npm run view creates a read-only weekly dashboard. /customise adds your fields and rules through a tested migration. /new-view adds a report.
+
+## Your first hour: ten things to ask for
+
+1. Put our name on the dataset cards.
+2. Show today's review queue.
+3. Explain the cancellation disagreement.
+4. Find labels with no approved examples.
+5. Show whose labels use old guidance.
+6. Preview our source export without saving it.
+7. Record the evidence behind a privacy check.
+8. Draft the next calibration note.
+9. Add our dataset owner field with /customise.
+10. Add a release readiness view with /new-view.
+
+## Operating boundaries
+
+Imported labels need local review. Every release requires all project examples to be ready, including current annotations, independent adjudication and evidence checks. Actor labels are not verified logins, and this tool does not certify legal compliance. Release means a local snapshot, not publication. Keep the actual purpose, retention decisions and personal information under your organisation's control. Hosting, agent use and operation remain your costs.
+
+[Compliance rules](docs/compliance.md), [operations and backup](docs/operations.md), [scope](docs/why-no-front-end.md), [research](docs/research.md). MIT. Not affiliated with Datasaur or Anthropic.

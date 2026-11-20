@@ -1,11 +1,57 @@
 [
   {
-    "name": "example",
-    "title": "TODO(author): the first document this industry must produce",
-    "for_each": "select gen_random_uuid() as id, 'Example' as name",
-    "file": "name",
+    "name": "dataset-card",
+    "title": "Dataset review card",
+    "for_each": "select id,code from projects order by code",
+    "file": "code",
     "sections": [
-      { "title": "Details", "sql": "select 'replace me' as item, $1::text as record_id" }
+      {
+        "title": "Purpose and policy",
+        "layout": "record",
+        "sql": "select code,name,purpose,guideline,guideline_version,labels,minimum_reviews,retention_review_on from projects where id=$1"
+      },
+      {
+        "title": "Review status",
+        "sql": "select code,owner,due_on,status,reviewers,answer_sets from review_queue where project_id=$1 order by code"
+      }
+    ]
+  },
+  {
+    "name": "adjudication-record",
+    "title": "Adjudication evidence record",
+    "for_each": "select id,code from items order by code",
+    "file": "code",
+    "sections": [
+      {
+        "title": "Source text and custody",
+        "layout": "record",
+        "sql": "select code,source,external_id,content,source_status,privacy_evidence,privacy_checked_by,held,hold_reason from items where id=$1"
+      },
+      {
+        "title": "Annotation history",
+        "sql": "select actor,labels,rationale,guideline_version,created_at from annotations where item_id=$1 order by sequence"
+      },
+      {
+        "title": "Decision history",
+        "sql": "select actor,labels,rationale,item_revision,guideline_version,created_at from decisions where item_id=$1 order by sequence"
+      }
+    ]
+  },
+  {
+    "name": "release-manifest",
+    "title": "Training release manifest",
+    "for_each": "select id,code from releases order by code",
+    "file": "code",
+    "sections": [
+      {
+        "title": "Release evidence",
+        "layout": "record",
+        "sql": "select code,actor,guideline_version,sha256,note,created_at from releases where id=$1"
+      },
+      {
+        "title": "Frozen examples",
+        "sql": "select e->>'code' code,e->>'source' source,e->>'external_id' external_id,e->>'content' content,e->>'labels' labels,e->>'reviewer' reviewer from releases r cross join lateral jsonb_array_elements(r.payload) e where r.id=$1"
+      }
     ]
   }
 ]

@@ -1,13 +1,20 @@
 [
   {
-    "name": "week",
-    "title": "This week",
-    "subtitle": "Text Annotation for Claude Code: what needs attention, rendered by npm run view",
+    "name": "annotation-week",
+    "title": "Text annotation review",
+    "subtitle": "Recorded evidence and local review policy",
     "sections": [
       {
-        "title": "Needs attention",
-        "note": "TODO(author): point this at the industry's attention view (overdue, stuck, quiet).",
-        "sql": "select 'replace me' as item, 'TODO(author)' as why"
+        "title": "Project progress",
+        "sql": "select code,name,items,ready,disagreements,overdue from project_progress order by code"
+      },
+      {
+        "title": "Review queue",
+        "sql": "select code,project,owner,due_on,reviewers,status from review_queue order by due_on,code"
+      },
+      {
+        "title": "Evidence checks",
+        "sql": "select code,rule,finding from compliance_findings order by code,rule"
       }
     ]
   }

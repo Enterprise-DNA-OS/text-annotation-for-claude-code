@@ -1,0 +1,6 @@
+Line,Text,Category,Label Status
+1,"The box is late, please check.",delivery,resolved
+2,"Please refund the damaged box.",delivery,conflicted
+2,"Please refund the damaged box.",cancellation,conflicted
+3,"Invoice question
+for last month",billing,resolved
